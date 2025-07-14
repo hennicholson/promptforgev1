@@ -1,17 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { authService } from '../lib/auth'
-import LicenseInfo from './LicenseInfo'
 
 interface HeaderProps {
   onApiKeyClick: () => void
-  onLicenseClick: () => void
 }
 
-export default function Header({ onApiKeyClick, onLicenseClick }: HeaderProps) {
+export default function Header({ onApiKeyClick }: HeaderProps) {
   const [hasApiKey, setHasApiKey] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   
   useEffect(() => {
     const checkApiKey = () => {
@@ -19,33 +15,28 @@ export default function Header({ onApiKeyClick, onLicenseClick }: HeaderProps) {
       setHasApiKey(!!savedKey)
     }
     
-    const checkAuth = () => {
-      setIsAuthenticated(authService.isAuthenticated())
-    }
-    
     checkApiKey()
-    checkAuth()
     window.addEventListener('storage', checkApiKey)
     
-    return () => {
-      window.removeEventListener('storage', checkApiKey)
-    }
+    return () => window.removeEventListener('storage', checkApiKey)
   }, [])
   
   return (
     <header className="app-header">
-        <div className="header-logo">
+      <div className="header-content">
+        <div className="app-branding">
+          <h1 className="app-title">PROMPT FORGE</h1>
+          <p className="app-tagline">AI Image Prompt Designer</p>
         </div>
         <div className="header-actions">
-          {isAuthenticated && (
-            <LicenseInfo onManageLicense={onLicenseClick} />
-          )}
           <button className="api-key-btn" onClick={onApiKeyClick}>
             <span className={`api-status ${hasApiKey ? 'active' : ''}`} id="apiStatus">
               {hasApiKey ? '✅' : '🔑'}
             </span>
+            <span className="api-text">API KEY</span>
           </button>
         </div>
+      </div>
     </header>
   )
 }
